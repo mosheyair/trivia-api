@@ -1,0 +1,273 @@
+##
+package com.moka.trivia.controller;
+
+import com.moka.trivia.model.Category;
+import com.moka.trivia.repository.CategoryRepository;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/categories")
+@CrossOrigin(origins = {"https://www.mokafullstack.com","https://api.mokafullstack.com"})
+public class CategoryController {
+
+    private final CategoryRepository repo;
+
+    public CategoryController(CategoryRepository repo) {
+        this.repo = repo;
+    }
+
+    @GetMapping
+    public List<Category> all() {
+        return repo.findAll();
+    }
+    @GetMapping("/test-db")
+    public String testDB() {
+        return "Database connection is working!";
+    }
+
+הוספת בקשת POST
+    @PostMapping
+    public Category addCategory(@RequestBody Category category) {
+        return repo.save(category);
+    }
+
+
+}
+
+
+
+==========================================================================================
+import org.springframework.web.bind.annotation.*;
+      חלק מהספרייה (framework) של Spring Boot.
+    זו חבילה שמיבאת את כל האנטציות הקשורות לשליטה ברשת...
+    כלומר - כלים שעוזרים לנו לחבר בין הפרונטנד לבקאנד
+    * הכוכבית מציינת יבוא של כל החבילה
+   @RestController	מציינת שהמחלקה היא Controller שמחזיר JSON
+   @RequestMapping	מגדיר נתיב בסיסי לבקשות (URL)
+   @GetMapping, @PostMapping, @PutMapping, @DeleteMapping	מגדירים סוגי פעולות HTTP
+   @PathVariable	תופס ערכים מתוך ה־URL
+   @RequestBody	מקבל נתונים מגוף הבקשה (JSON שנשלח מהFrontend)
+   @CrossOrigin	שולט על הרשאות גישה מדומיינים אחרים (CORS)
+
+       **CategoryController**
+       ----------------------
+
+   @RestController
+   @RequestMapping("/api/categories")
+   @CrossOrigin(origins = {"https://www.mokafullstack.com","https://api.mokafullstack.com"})
+   public class CategoryController {
+
+       private final CategoryRepository repo;
+
+       public CategoryController(CategoryRepository repo) {
+           this.repo = repo;
+       }
+
+       @GetMapping
+       public List<Category> all() {
+           return repo.findAll();
+       }
+   }
+
+   @RestController - אומר לספרינג שזו מחלקת קונטרול שמחזירה ג'יסון
+   @RequestMapping - אנוטציה שמגיעה מסיפרית ספרינג והיא אומרת לספרינג :
+     כשמגיעה בקשה לכתובת מסויימת תעביר אותה לטיפול כאן. המשמעות היא:
+     כל הבקשות שמתחילות ב־/api/categories
+     ינותבו למחלקה הזו— CategoryController
+   @CrossOrigin(...) - Cross-Origin Resource Sharing
+     זהו מנגנון אבטחה של הדפדפן שמונע מאתר אחד לגשת לשרת של אתר אחר אלה אם השרת מרשה במפורש
+     במקרה שלי יש שני אתרים שונים:
+           1. frontend - "https://www.mokafullstack.com"
+           2. backend - "https://api.mokafullstack.com"
+        @CrossOrigin(...) - מאפשר בקשות ממקורות חיצוניים
+        origins = { ... } - הרשימה של הדומיינים המותרים
+           אם לא שמים את זה הדפדפן יחסום את הבקשה
+**public class CategoryController {
+      הגדרת מחלקה בג'אווה והמשמעות: אני מגדיר מחלקה חדשה בשם "CategoryController" והיא תהיה מחלקה ציבורית
+       CategoryController - עבור קטגוריות HTTP היא מחלקה שמיצגת את נקודת הכניסה לטיפול בבקשות
+       והיא מכילה:
+         מתודות - all
+         משתנים - repo
+ בנאי - (...) CategoryController
+     @RestController - ספרינג יודע לזהות שהמחלקה הזו היא מחלקת קונטרולר בזכות האנוטציה
+        ברגע שהוא מפעיל את האפליקציה (Spring Boot),
+        הוא סורק את כל המחלקות בפרויקט ומחפש מחלקות עם @RestController.
+        כאשר הוא מוצא את public class CategoryController,
+        הוא רושם אותה כ־Bean פעיל בתוך המערכת,
+        ומקשר את הבקשות שמגיעות ל־/api/categories אליה.
+     @GetMapping - לכתובת הרלוונטית GET מסוג HTTP אנוטציה שמסמנת: הפונקציה תופעל כשתגיע בקשת
+         במילים אחרות כשהפרונטנד שולח בקשת GET לשרת "ספרינג" תזהה את זה ותפעיל את הפונקציה הזו
+         אם נשלח מהדפדפן fetch("https://api.mokafullstack.com/api/categories")
+         ספרינג תפעיל את המתודה הבאה בקוד:
+           public List<Category> all() {
+               return repo.findAll();
+           }
+ **public List<Category> all() {
+         return repo.findAll();
+     }
+       public - GET חשוב שתהיה ציבורית מאחר וספרינג צריכה לגשת אליה מבחוץ כשהיא מקבלת בקשת
+       List<Category> - זהו סוג הערך שתחזור ממנו הפונקציה כלומר
+                       המתודה מחזירה רשימה של אובייקט מסוג קטגוריה
+       all() - זה שם המתודה, זו מתודה שמחזירה את כל הקטגוריות
+       return repo.findAll() - זהו הגוף של הפונקציה
+           מה התהליך כאן:
+           אנחנו משתמשים במשתנה repo — שזוכר, הוא מסוג CategoryRepository
+           קוראים לפונקציה findAll() מתוך Spring Data JPA
+           Spring כבר מטפלת בגישה למסד הנתונים.
+           והתוצאה היא רשימה (List<Category>) — בדיוק מה שאנחנו מחזירים
+           בקצרה: קבלת בקשה - ניגשים למסד הנתונים - שולפים את כל הקטגוריות - מחזירים אותן כג'יסון
+              (בזכות @RestController –  לא צריך לכתוב קוד שממיר ל־JSON)
+
+              *** repo ***
+      repo הוא פשוט שם משתמש במחלקה (private final CategoryRepository repo;)
+      אבל מה שחשוב זה מה שהוא מיצג "שער הכניסה" אל מסד הנתונים
+      CategoryRepository והוא מחובר למחלקה שניקראת
+        מהיא מחלקת CategoryRepository
+        זו מחלקה שמרחיבה את JpaRepository<Category, Long>
+        וברגע ש־Spring רואה את זה — היא יוצרת אוטומטית מחלקה שיודעת:
+            איך לגשת לטבלה categories
+            איך לשלוף ממנה רשומות
+            איך לשמור, למחוק ולעדכן
+            הכול בלי לכתוב SQL אחד
+          במחלקת (CategoryController) אנחנו אומרים:
+            private final CategoryRepository repo;
+            זה אומר: “בתוך הקונטרולר שלי, אני רוצה להחזיק עותק של ה־Repository הזה.”
+          ואז ב־Constructor:
+            public CategoryController(CategoryRepository repo) {
+                this.repo = repo;
+            }
+            אנחנו מקבלים את ה־Repository מ־Spring (Dependency Injection)
+            ומשייך אותו למשתנה שלנו שנקרא גם repo.
+            ולכן — בכל פעם שאנחנו כותבים:
+              repo.findAll();
+            אנחנו בעצם אומרים:
+              “תשתמש ב־CategoryRepository שמחובר למסד הנתונים,
+              ותביא לי את כל רשומות הקטגוריות.”
+
+**@PostMapping
+    public Category addCategory(@RequestBody Category category) {
+        return repo.save(category);
+    }
+       @PostMapping =  /api/categories לכתובת  POST מאזין לבקשות
+
+       @RequestBody = כשנשלחת בקשה JSONאומר לספרינג לקחת את גוף ה־
+       ולהמיר אותו אוטומטית לאובייקט מסוג Category
+
+       repo.save(category) = JPA שומר את הנתון הזה בטבלה דרך
+
+
+
+
+
+******************************************************************************************
+תרשים זרימה לאיך עובדת מחלקת הקונטרולר:
+
+[הדפדפן (Frontend)]
+        |
+        | שולח בקשת GET לכתובת:
+        | https://api.mokafullstack.com/api/categories
+        |
+        ▼
+[Spring Boot מקבל את הבקשה]
+        |
+        | סורק את המחלקות שמסומנות ב-@RestController
+        ▼
+[CategoryController מזוהה כמתאימה]
+        |
+        | @RequestMapping("/api/categories")  ← תואם לכתובת
+        | @GetMapping                         ← תואם לסוג הבקשה
+        ▼
+[מפעיל את המתודה: public List<Category> all()]
+        |
+        | בשורה הזו יש:
+        | return repo.findAll();
+        ▼
+[repo = אובייקט של CategoryRepository]
+        |
+        | מתבצעת פנייה למסד הנתונים:
+        | SELECT * FROM categories
+        ▼
+[Spring Data מחזיר רשימה של אובייקטים מסוג Category]
+        |
+        | לדוגמה:
+        | [ {id:1, name:"History"}, {id:2, name:"Math"} ]
+        ▼
+[Spring ממיר את הרשימה ל-JSON אוטומטית]
+        |
+        | בזכות @RestController → התוצאה חוזרת כ-JSON
+        ▼
+[הדפדפן מקבל את התשובה ומציג את הקטגוריות למשתמש]
+*******************************************************************************************
+
+           ***QuestionController***
+           ------------------------
+
+זהה למחלקת הקטגוריה רק בהבדל בפקודה אחת..
+         @GetMapping
+         public List<Question> list(@RequestParam(required = false) Long categoryId) {
+             if (categoryId == null) {
+                 throw new IllegalArgumentException("Category ID is required to start the game.");
+             }
+             return repo.findByCategoryId(categoryId);
+         }
+
+@RequestParam - URLמאפשר לקבל פרמטר מה־
+
+Category ID is required to start the game בודקת אם נשלחה בחירת קטגוריה ואם לא מחזירה שגיאה
+
+
+**@PostMapping
+    public Category addCategory(@RequestBody Category category) {
+        return repo.save(category);
+    }
+
+    @PostMapping =  /api/categories לכתובת  POST מאזין לבקשות
+
+    @RequestBody = כשנשלחת בקשה JSONאומר לספרינג לקחת את גוף ה־
+    ולהמיר אותו אוטומטית לאובייקט מסוג Category
+
+    repo.save(category) = JPA שומר את הנתון הזה בטבלה דרך
+
+****************************************************************************************
+            ***תרשים זרימה למחלקת השאלות***
+
+  🟩 התחלה: קריאה ל־/api/questions עם פרמטר ?categoryId=מספר
+
+        |
+        v
+
+  🔷 האם categoryId הגיע?
+
+        |
+        |— כן —► 🔹 repo.findByCategoryId(categoryId)
+        |           שולף את כל השאלות מהקטגוריה הספציפית
+        |
+        |— לא —► 🔹 מחזיר שגיאה (Bad Request) עם הודעה:
+                    "Category ID is required to start the game."
+
+        |
+        v
+
+  🟦 שליחת רשימת שאלות (בפורמט JSON) לפרונטאנד
+
+        |
+        v
+
+  🟥 סוף — השאלות מוצגות למשתמש בדף המשחק
+
+
+הסבר פשוט במילים
+
+המשתמש בחר קטגוריה → פרונטאנד שולח בקשה ל־/api/questions?categoryId=2.
+
+הקונטרולר מקבל את הערך 2 ובודק שהוא לא ריק.
+
+אם יש categoryId → מבצע שאילתה repo.findByCategoryId(2) ומחזיר את כל השאלות מהקטגוריה.
+
+אם אין → מחזיר שגיאה שהמשחק לא יכול להתחיל בלי בחירת קטגוריה.
+
+השאלות נשלחות לפרונטאנד ומוצגות לשחקן.
+*******************************************************************************************
+
+

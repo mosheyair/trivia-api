@@ -1,0 +1,306 @@
+      **Category**
+
+package com.moka.trivia.model;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
+@Entity
+public class Category {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;   // שם הנושא (History, Mathematics, Game Theory)
+
+    // --- Getters & Setters ---
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+****************************************************************************************
+
+**package com.moka.trivia.model;
+זה ה־package של המחלקה. מקטלג אותה תחת model,
+כי היא מייצגת ישות נתונים (Entity) שנשמרת במסד.
+
+**import jakarta.persistence.Entity;
+**import jakarta.persistence.GeneratedValue;
+**import jakarta.persistence.GenerationType;
+**import jakarta.persistence.Id;
+   @Entity	מסמן שהמחלקה הזו מייצגת טבלה במסד הנתונים
+   @Id	מזהה את השדה שהוא המפתח הראשי (Primary Key)
+   @GeneratedValue	מגדיר איך המסד יוצר את הערכים (ID אוטומטי)
+   GenerationType.IDENTITY	אומר למסד: "תן לי מזהה חדש אוטומטי לפי מספר רץ" (Auto-increment)
+       GenerationType.IDENTITY - זו אחת מ־4 אסטרטגיות אפשריות
+          IDENTITY	נותן למסד הנתונים ליצור את הערך (Auto Increment) ← הכי נפוץ
+          AUTO	Hibernate יבחר את הדרך לפי מסד הנתונים
+          SEQUENCE	מתאים למסדי נתונים שתומכים ב־Sequence (למשל PostgreSQL)
+          TABLE	יוצר טבלת ID מיוחדת (נדיר מאוד בשימוש אמיתי)
+
+**@Entity
+  public class Category {
+     Entity - זו מחלקה שממופה לטבלה במסד הנתונים
+הטבלה תיקרא category כברירת מחדל (לפי שם המחלקה, באותיות קטנות).
+
+**@Id
+**@GeneratedValue(strategy = GenerationType.IDENTITY)
+   private Long id;
+        @GeneratedValue -  שהערך של השדה יוצר אוטומטית JPAאומר ל
+        strategy... - איך בדיוק הערך יוצר
+
+     שדה id:
+        הוא Primary Key
+הערך שלו נוצר אוטומטית ע"י המסד (AUTO_INCREMENT)
+        לדוגמה: השורה הראשונה תקבל id = 1, השנייה id = 2 וכו'
+
+JPA (Java Persistence AP) - ממשק סטנדרטי לשמירה ושליפה של אובייקטים למסד נתונים
+SQL עוזר לך לעבוד עם מסדי נתונים בלי לכתוב JPA
+ עובדים עם אובייקטים ב־Java, והוא כבר ממפה אותם לטבלאות מאחורי הקלעים.
+
+ פעולה  	                    בלי  JPA        	 עם JPA
+קריאת טבלה	 SELECT * FROM category	             repo.findAll()
+הכנסת שורה	 INSERT INTO category ...	         repo.save(category)
+מחיקה לפי ID	 DELETE FROM category WHERE id = 5	 repo.deleteById(5)
+
+      **Getters ו־Setters**
+**public Long getId() {
+      return id;
+  }
+  public void setId(Long id) {
+      this.id = id;
+  }
+  public String getName() {
+      return name;
+  }
+  public void setName(String name) {
+      this.name = name;
+  }
+      אלו מתודות גישה:
+      מאפשרות ל־Spring ול־Jackson (הספרייה שממירה ל־JSON) לקרוא ולכתוב את הנתונים.
+
+   Category.java	מייצגת טבלה במסד הנתונים
+   CategoryRepository	מאפשר לנו לשלוף/להוסיף/לעדכן Category בלי לכתוב SQL
+   CategoryController	מקבל בקשות HTTP ושולף את הקטגוריות מה־Repository
+   הדפדפן	רואה את התוצאה כ־JSON
+
+   מונחים חשובים בעולם JPA:
+     @Entity -      	מסמן שמחלקה היא ישות שנשמרת במסד
+     @Id -          	    מזהה את המפתח הראשי (Primary Key)
+     @GeneratedValue -	מחולל ID אוטומטי
+     Repository -   	מחלקה שמבצעת את הפעולות מול המסד
+     Persistence -  	המונח הכללי ל"שמירה של אובייקטים" לאורך זמן
+
+ מי מפעיל את JPA בפועל?
+     (API) הוא רק ממשק JPA
+     מאחוריו עומד מנוע מימוש (נקרא גם “Provider”)
+
+ הנפוץ ביותר:
+   Hibernate ← זה המנוע שספרינג-בוט משתמש בו כברירת מחדל
+       בפועל אנחנו כותבים קוד מול JPA
+       Hibernate - הוא זה שמייצר את השאילתות, מתחבר למסד, ושומר את הנתונים בפועל
+
+   My file Category, Question and Repository use with that
+
+**************************************************************************************
+
+[Spring Boot עולה]
+     |
+     | מזהה את המחלקה Category עם @Entity
+     ▼
+["category" יוצר טבלה בשם Spring במסד הנתונים]
+     |
+     | העמודות הן:
+     | - id (מזהה אוטומטי, Primary Key)
+     | - name (שם הקטגוריה)
+     ▼
+[כשמבצעים repo.findAll() הנתונים נטענים מהטבלה ]
+     |
+     | הנתונים נשלחים למשתמש כ-JSON דרך הקונטרולר
+
+#######################################################################################
+            **Question class**
+
+package com.moka.trivia.model;
+
+import jakarta.persistence.*;
+
+@Entity
+public class Question {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;            // מפתח ראשי רץ אוטומטית
+
+    private String question;    // הטקסט של השאלה
+    private String answer;      // התשובה
+    private String explanation; // הרחבה
+
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false) // foreign key לקטגוריה
+    private Category category;
+
+    // --- בנאים (constructors) ---
+    public Question() {}
+
+    public Question(String question, String answer, String explanation, Category category) {
+        this.question = question;
+        this.answer = answer;
+        this.explanation = explanation;
+        this.category = category;
+    }
+
+    // --- getters & setters ---
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getQuestion() {
+        return question;
+    }
+
+    public void setQuestion(String question) {
+        this.question = question;
+    }
+
+    public String getAnswer() {
+        return answer;
+    }
+
+    public void setAnswer(String answer) {
+        this.answer = answer;
+    }
+
+    public String getExplanation() {
+        return explanation;
+    }
+
+    public void setExplanation(String explanation) {
+        this.explanation = explanation;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+}
+------------------------------------------------------------------------------------------
+
+Question היא טבלה במסד הנתונים Entity
+כל שאלה שייכת ל־קטגוריה אחת → קשר ManyToOne
+יש שדות לטקסט השאלה, תשובה, והסבר
+יש בנאים + getters/setters
+
+**@Entity
+  public class Question {
+        Entity -(question) מחלקה שממופה לטבלה במסד
+ברגע שהשרת עולה, Spring + Hibernate יודעים ליצור טבלה לפי המחלקה הזו.
+
+**@Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+       ID - (Primary Key) מזהה ייחודי לכל שאלה
+       נוצר אוטומטית ע״י המסד באמצעות מספר רץ.
+
+**private String question;
+**private String answer;
+**private String explanation;
+     question: (למשל: "What is 2+2?") השאלה עצמה
+     answer: התשובה הנכונה ("4")
+     explanation: הסבר נוסף שיוצג אחרי שהתשובה נבחרה
+     במסד הנתונים כל שדה כזה יהפוך לעמודה בטבלת question.
+
+**@ManyToOne
+  @JoinColumn(name = "category_id", nullable = false)
+  private Category category;
+         החלק הכי חשוב כאן - קשרים בין טבלאות כאן קורה הקסם האמיתי..
+    @ManyToOne:
+      מציין קשר של הרבה שאלות שייכות לקטגוריה אחת
+      לדוגמה: 5 שאלות ששייכות לקטגוריה "Mathematics"
+    @JoinColumn:
+      אומר ל־JPA:
+      "כשתיצור את הטבלה במסד, תוסיף עמודה בשם category_id שתשמש כ־Foreign Key"
+    nullable = false:
+       השדה חייב להכיל קטגוריה – שאלה לא יכולה להיות בלי נושא
+
+       איך זה נראה בסוף..
+     | id | question     | answer | explanation | category_id |
+     | -- | ------------ | ------ | ----------- | ----------- |
+     | 1  | What is 2+2? | 4      | Simple math | 2           |
+
+           הבנאים
+**public Question() {}
+   JPA מחייב אותנו לקונסטרוקטור ריק
+
+**public Question(String question, String answer, String explanation, Category category) {
+      ...
+  }
+מאפשר לנו ליצור שאלה מלאה עם כל השדות
+
+      **getters & setters**
+מאפשרים ל־Spring (וגם לנו) לגשת לערכים ולשנות אותם, כולל:
+getCategory() – מחזיר את הקטגוריה שאליה השאלה שייכת
+setCategory(...) – מאפשר לשייך את השאלה לקטגוריה
+
+          **סיכום**
+id -	מזהה ייחודי (Primary Key)
+question -	טקסט השאלה
+answer -	התשובה הנכונה
+explanation -	הסבר שיוצג לאחר התשובה
+category -	אובייקט Category, שמקושר דרך Foreign Key בשם category_id
+
+**תרשים קשר בין שאלות לקטגוריות**
+┌────────────────────────┐             ┌──────────────────────────┐
+│      Category          │             │         Question         │
+│────────────────────────│             │──────────────────────────│
+│ id : Long (PK)         │◄───────────▶│ category : Category (FK) │
+│ name : String          │             │ id : Long (PK)           │
+└────────────────────────┘             │ question : String        │
+                                       │ answer : String          │
+                                       │ explanation : String     │
+                                       └──────────────────────────┘
+       לכל Category יכולים להיות הרבה Question
+   אבל כל Question שייכת ל־קטגוריה אחת בלבד
+
+
+
+
+
+תרשים זרימה טקסטואלי – יצירת אובייקט Question:
+
+[Spring Boot עולה]
+        |
+        | מזהה את המחלקה Question כ-Entity
+        ▼
+[יוצר טבלה בשם question במסד הנתונים]
+        |
+        | העמודות: id, question, answer, explanation, category_id
+        ▼
+[הקשר ל-Category נוצר ע"י Foreign Key (category_id)]
+        |
+        | כל שאלה חייבת להכיל קטגוריה אחת
+        ▼
+[בעת שמירת שאלה, Spring מוסיף רשומה עם category_id מתאים]
+

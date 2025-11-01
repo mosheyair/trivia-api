@@ -1,0 +1,66 @@
+         CategoryRepository
+package com.moka.trivia.repository;
+
+import com.moka.trivia.model.Category;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface CategoryRepository extends JpaRepository<Category, Long> {
+}
+
+     package com.moka.trivia.repository:
+         המחלקה הזו נמצאת בתיקייה repository — כלומר היא חלק מהשכבה שמטפלת בגישה למסד הנתונים.
+     import com.moka.trivia.model.Category:
+       הולכים לעבוד על טבלת Category, ולכן צריך לייבא את המחלקה Category שנמצאת בתיקיית model
+     import org.springframework.data.jpa.repository.JpaRepository
+        זו מחלקת־על (interface) של Spring Data JPA
+        כשאנחנו מרחיבים אותה (extends), מקבלים באופן אוטומטי עשרות פונקציות מוכנות לעבודה עם מסד נתונים
+  @Repository:
+    אנוטציה שמסמנת ל־Spring שזו מחלקה שמטפלת בגישה ל־DB
+  בזכות אטונציה זו ספרינג יכולה ליצור מופע ולהזריק אותו לכל מקום שנדרש
+       במקרה שלנו דרך הבנאי
+  public interface CategoryRepository extends JpaRepository<Category, Long>
+     כאן מתרחש הקסם, מגדירים ממשק (interface) בארבעת המילים הבאות:
+          extends JpaRepository<Category, Long>
+     ספרינג יוצרת מחלקה שמתחברת לטבלת "קטגוריה" במסד הנתונים ומבצעת אוטומטית:
+           findAll() - מחזירה את כל השורות
+           findById(Long id) - ID מחזירה שורה לפי
+           save(Category c) - מעדכן ושומר רשומה חדשה
+           deleteById(Long id) - ID מוחק לפי
+           ועוד ...
+           Category — זה סוג האובייקט שרוצים לנהל
+           Long — (ID) זה סוג המפתח הראשי של הטבלה.
+
+** איך זה עובד **
+   Spring Data JPA - (מאגר תבניות) Repository Pattern מבוסס על רעיון שניקרא
+     "תן לי אובייקט מסוג מסוים (Category), ואני כבר אדע איך לייצג אותו כטבלה במסד."
+
+למעשה כאן אנחנו יכולים להוסיף פעולות מיוחדות כמו:
+      List<Category> findByName(String name);
+וספרינג יבין לבן ויבנה מסד כזה בלי לכתוב אותו:
+      SELECT * FROM categories WHERE name = ?
+
+***********************************************************************************
+
+        ***QuestionRepository***
+
+package com.moka.trivia.repository;
+
+import com.moka.trivia.model.Question;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import java.util.List;
+
+@Repository
+public interface QuestionRepository extends JpaRepository<Question, Long> {
+    List<Question> findByCategoryId(Long categoryId);
+}
+
+בשביל שהשורה repo.findByCategoryId(categoryId); תעבוד אנחנו חייבים שיהיה כתוב:
+   List<Question> findByCategoryId(Long categoryId);
+ספרינג תבין את זה לבד ותריץ את השאילתה המתאימה אוטומטית (כמו שעשתה עם findAll()).
+
+
+
+

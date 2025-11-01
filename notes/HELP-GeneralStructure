@@ -1,0 +1,72 @@
+# 📚 Moka Trivia – תיעוד פנימי למפתח
+
+## 🧭 מבנה כללי
+
+- פרויקט מבוסס Spring Boot
+- Frontend פונה ל־Backend באמצעות REST API
+- דומיינים פעילים:
+  - `https://www.mokafullstack.com` – אתר ראשי
+  - `https://api.mokafullstack.com` – שרת API
+
+---
+
+## 🎯 Controllers
+
+### 🧩 CategoryController
+- נתיב בסיסי: `/api/categories`
+- מחזיר את כל הקטגוריות מה־DB
+- Annotations:
+  - `@RestController`
+  - `@RequestMapping("/api/categories")`
+  - `@CrossOrigin(...)`
+- פעולות עיקריות:
+  - `GET /api/categories` – מחזיר רשימת קטגוריות (`List<Category>`)
+
+### 🧩 QuestionController
+*(עדיין בפיתוח / או להשלים פרטים בהמשך)*
+- נתיב בסיסי: `/api/questions`
+- פעולות:
+  - `GET /api/questions` – מחזיר שאלה רנדומלית
+  - `POST /api/questions` – שומר שאלה חדשה
+
+---
+
+## ⚙️ Services
+
+### 🔧 QuestionService
+- לוגיקה עיקרית של שליפת שאלות
+- תומך בפילטר לפי קטגוריה
+- יוצר אינטראקציה עם `QuestionRepository`
+
+---
+
+## 🗂️ Repositories
+
+### 📁 CategoryRepository
+- ממשק של `JpaRepository<Category, Long>`
+- פעולות: `findAll()`
+
+### 📁 QuestionRepository
+- ממשק של `JpaRepository<Question, Long>`
+- פעולות: `findByCategory(...)`, `save(...)`, `deleteById(...)` ועוד
+
+---
+
+## 🧱 Entities (Model)
+
+### 📌 Category
+- שדות: `id`, `name`
+- טבלת DB: `categories`
+
+### 📌 Question
+- שדות: `id`, `content`, `category`, `answers`, `correctAnswer`
+
+---
+
+## 🔐 CORS Configuration
+
+```java
+@CrossOrigin(origins = {
+    "https://www.mokafullstack.com",
+    "https://api.mokafullstack.com"
+})

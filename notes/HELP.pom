@@ -1,0 +1,224 @@
+קובץ pom.xml הוא לב של כל פרוייקט מבוסס MAVEN
+הקובץ מגדיר:
+   תצורת הפרויקט (שם, גרסה, תאור וכו')
+    תלויות (ספריות שצריך להוריד כדי שהקוד ירוץ)
+     תוספים (PLUGINS) שבונים את הפרוייקט או מוסיפים לו יכולות
+      תצורת הבניה (BUILD CONFIGURATION) כולל גרסת ג'אווה, יצירת קובץ GAR, ועוד
+
+        dependency - תלות
+at maven תלות היא סיפריה שחיבים לייבא כדי פרוייקט יעבוד
+כל תלות נכתבת בין התגיות:
+<dependency> ... </dependency>
+וכל תלות נימצאת בתוך התגית  (ריבוי תלויות)
+<dependencies>....</dependencies>
+
+     דוגמא פשוטה
+<dependencies>  אוסף של קבוצת התלויות   -
+<dependency>כל תלות בפני עצמה   -
+    <groupId>org.springframework.boot</groupId>הקבוצה שממנה מגיעה התלות - כמו שם חברה או אירגון
+    <artifactId>spring-boot-starter-web</artifactId>  שם התלות - הסיפריה שצריך
+</dependency>
+</dependencies>
+<version> אם לא מצויין לפעמים נלקח אוטומטית מהparent
+<scope>תחום השימוש בתלות כמו: runtime or test
+
+           איך זה נראה בקובץ הנוכחי
+    <dependencies>   אוסף של כל קבוצת התלויות
+
+               תלות ראשונה
+        <dependency> פתיחת תלות שמוסיפה תמיכה בJPA ו HIBERNATE - גישה למסד נתונים בצורה מונחית עצמים
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency> סגירת תלות למסד הנתונים
+
+               תלות שניה
+        <dependency>מוסיפה יכולת לבנות REST APIs או אתרים מבוססי Spring MVC
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency> סגירת התלות
+
+                  תלות שלישית
+        <dependency>דרייבר של MySQL — מאפשר לתקשר עם מסד הנתונים
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <scope>runtime</scope>
+        </dependency> סגירת התלות של הדייבר
+
+                  תלות רביעית
+        <dependency>מוסיף כלים לכתיבת בדיקות (JUnit, Mockito וכו') — משמש רק ב־scope של test
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>סגירת התלות של test
+
+    </dependencies> סגירת קבוצת התלויות
+
+    <?xml version="1.0" encoding="UTF-8"?>
+הכרזה על גרסת הקובץ מסוג XML והקידוד (Encoding)
+    version="1.0" -xml מציין שזו גירסה 1.0 של תקן
+    encoding="UTF-8 - מציין שהקובץ כתוב בקידוד תומך בעיברית צרפתית ועוד
+    אין לזה קשר ישיר ל־Java או Maven — זו רק פתיח טכני שדרוש לכל קובץ XML תקני
+
+    <project xmlns="http://maven.apache.org/POM/4.0.0"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+תגית <project> פותחת את כל קובץ ה־POM.
+השדות xmlns ו־xmlns:xsi מגדירים מילון מונחים (Namespace) – כלומר מאיפה Maven לוקח את ההגדרות והחוקים של הקובץ הזה
+        📌 זה כמו להגיד למחשב: "תקרא את הכללים מכתובת מסוימת כדי להבין מה המשמעות של כל תגית כאן."
+
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+שורת Schema. היא אומרת:
+ אם אתה לא בטוח איך לבדוק שה־POM הזה תקני, לך לפי הקובץ שבכתובת הזו:
+    https://maven.apache.org/xsd/maven-4.0.0.xsd
+        📌 לא נוגעים בזה — זו הגדרה ברירת מחדל בכל קובץ pom.xml.
+
+        <parent>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-parent</artifactId>
+            <version>3.5.5</version>
+            <relativePath/> <!-- lookup parent from repository -->
+        </parent>
+ יורש הגדרות כלליות מהורה (Parent).
+  כאן זה ההורה זה: spring-boot-starter-parent
+  במקום להגדיר לבד תצורת קומפילציה, גרסאות תלותים, ניהול גרסאות וכו’ — אתה יורש את ההגדרות של Spring Boot 3.5.5.
+        relativePath/ ריק  - MAVEN יחפש את הקובץ ברשת
+בגלל שהן נמשכות אוטומטית מההורה <version> 📌 חשוב: בזכות ההורה הזה אתה לא צריך לרשום גרסאות בכל תלות
+
+            <groupId>com.moka</groupId>  שם הקבוצה או האירגון
+            <artifactId>trivia</artifactId> שם הפרוייקט או המודול
+            <version>0.0.1-SNAPSHOT</version> גרסת המודול (גרסת פיתוח זמנית)
+    אלו שלושת הערכים הכי חשובים במזהה של הפרויקט (נקראים GAV)
+            📌 השילוב הזה (com.moka:trivia:0.0.1-SNAPSHOT) הוא כמו תעודת זהות של הפרויקט
+
+            <name>trivia</name>
+            <description>trivia</description>
+            <url/>
+            <licenses>
+                <license/>
+            </licenses>
+            <developers>
+                <developer/>
+            </developers>
+      כל אלו פרטים כלליים:
+       שם, תיאור, כתובת אתר, רישיון, מפתח — משמשים בעיקר לפרויקטים שמתפרסמים לציבור.
+       אם אתה לא מעלה את זה ל־Maven Central, אפשר להשאיר ריק.
+
+            <scm>
+                <connection/>
+                <developerConnection/>
+                <tag/>
+                <url/>
+            </scm>
+ SCM = Source Control Management
+ כאן אתה יכול לציין כתובת ל־GitHub/GitLab או כל מערכת ניהול קוד.
+    לדוגמה: https://github.com/mosheyair/trivia-ai-test.git
+       📌  אין חובה — שימושי אם תפרסם את הקוד
+
+            <properties>
+                <java.version>21</java.version>
+            </properties>
+
+            הגדרת גרסת Java שתשמש לבניית הפרויקט.
+            🔧 כאן אתה מצהיר שאתה משתמש ב־Java 21.
+     זה חשוב! כי אם תשתמש בתכונות חדשות של Java, Maven יידע לתרגם בהתאם.📌
+
+       תלות ראשונה spring-boot-starter-data-jpa
+   חבילת גישה למסד נתונים
+מאפשרת להגדיר מחלקות ג'אווה כאילו הן טבלאות במסד נתונים - Entity
+מאפשרת לבצע פעולות CRUD בצורה מונחית עצמים
+    CRUD = יצירה קריאה עדכון מחיקה
+מוסיפה אוטומטית את הסיפריות: javax.persistence, Hibernate and more
+              דוגמא
+            @Entity
+            public class Question {
+            @Id
+            @GeneratedValue
+            private Long id;
+
+            private String content;
+            }
+    אם לא נתקין אותה :
+ לא נוכל להשתמש ב־@Entity, @Repository, או JpaRepository
+ לא תהיה גישה נוחה למסד נתונים
+
+          תלות שניה spring-boot-starter-web
+ זהו הסטארטר ל־Web – כלומר להפעלת שרת HTTP (REST APIs או HTML).
+ היא מוסיפה סיפריות כמו:
+            Spring MVC (ניהול בקשות HTTP)
+            Embedded Tomcat (שרת פנימי)
+            Jackson (המרת JSON ↔ Java)
+
+            דוגמה:
+            @RestController
+            public class TriviaController {
+            @GetMapping("/hello")
+            public String hello() {
+            return "Hello World";
+            }
+            }
+
+    אם לא נתקין אותה :
+ לא נוכל ליצור API עם @RestController או להאזין לכתובות כמו /questions.
+
+          תלות שלישית mysql-connector-j
+ זה הדרייבר של MySQL – המתווך בין הקוד למסד הנתונים.
+מה התפקיד:
+ מאפשרת ל־Spring להתחבר ל־MySQL דרך JDBC.
+ נדרשת בזמן ריצה, לא בזמן קומפילציה (לכן scope=runtime).
+   scope = runtime  - Maven לא כולל אותה בזמן קומפלציה אלה רק שהפרוייקט רץ בפועל כדי לא להכביד על הבניה
+    ללא זה נראה שגיעת התחברות למסד בסגנון :
+            No suitable driver found for jdbc:mysql
+
+          תלות רביעית spring-boot-starter-test
+ ספרית בדיקות - כל מה שצריך כדי לבדוק את הקוד
+            תפקידה הוא :
+            מוסיפה JUnit, Mockito, AssertJ, ועוד כלים לבדיקה.
+            פועלת רק בזמן בדיקה (לא כלולה ב־JAR הסופי).
+            דוגמא:
+            @SpringBootTest
+            class TriviaApplicationTests {
+            @Test
+            void contextLoads() {
+            assertTrue(true);
+            }
+            }
+ללא זה לא נוכל להריץ בדיקות
+            קבצי TEST יכשלו
+
+            שלב אחרון אחרי התלויות מגיע שלב הבניה - BUILD
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+ <build>  בלוק שמגדיר איך לבנות את הפרויקט   -
+     <plugins>  אוסף של תוספים שכל אחד מהם מוסיף יכולת לתהליך הבניה
+         spring-boot-maven-plugin - Spring Boot-זהו התוסף הכי חשוב ל
+         הוא מאפשר ל-maven
+         לארוז את הקוד ל־JAR רץ (כלומר תוכנה אחת שאפשר להריץ בפקודה java -jar app.jar)
+         להכניס לתוך ה־JAR את כל התלויות (Dependencies) – כך שהקובץ יהיה עצמאי ולא יצטרך "לרדוף" אחרי ספריות.
+         להוסיף פקודות כמו mvn spring-boot:run כדי להריץ ישירות את האפליקציה מתוך Maven.
+
+         📌 בלי הפלאגין הזה הינו מקבלים JAR "רגיל" – שהיה צריך ידנית לחבר אליו את כל הספריות.
+         עם הפלאגין – אתה מקבל Fat JAR / Uber JAR → קובץ יחיד, עצמאי, שמוכן ל־Deploy.
+
+    </project>  סגירת הקובץ   -
+
+          לסיכום של ה- POM.XML
+    1. Header – תקני עם קידוד וסכימה  XML קובץ
+2. parent - (ניהול גרסאות ותצורות) Spring Boot Starter Parent- ירושה מ
+3. GAV - (groupId, artifactId, version) מזהה את הפרויקט
+4. Meta Info -  (לא חובה)  SCM תיאור, רישיון, מפתחים
+5. Properties - גירסת הג'אווה
+6. Dependencies - כל הסיפריות שהפרויקט צריך
+7. Build Plugins -  (spring-boot-maven-pluginכולל ה־) איך לארוז את הפרויקט
+
+    מה קורה בפועל:
+    כותב קוד ב־IntelliJ
+    מקבל קובץ target/trivia-0.0.1-SNAPSHOT.jar  ועושה mvn package
+
+
+

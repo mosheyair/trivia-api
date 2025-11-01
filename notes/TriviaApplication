@@ -1,0 +1,100 @@
+
+package com.moka.trivia;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+
+@SpringBootApplication
+@EntityScan("com.moka.trivia.model")
+@EnableJpaRepositories("com.moka.trivia.repository")
+public class TriviaApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(TriviaApplication.class, args);
+    }
+}
+-----------------------------------------------------------------------------------------
+קוד חלופי...
+package com.moka.trivia;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.annotation.Bean;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+
+@SpringBootApplication
+@EntityScan("com.moka.trivia.model")
+@EnableJpaRepositories("com.moka.trivia.repository")
+public class TriviaApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(TriviaApplication.class, args);
+    }
+
+    // בלוק שמופעל אוטומטית אחרי שהאפליקציה עלתה
+    @Bean
+    public CommandLineRunner manualDbConnection() {
+        return args -> {
+            System.out.println(">> מחכה 3 שניות לחיבור לשרת...");
+            Thread.sleep(3000); // מחכה 3 שניות - מדמה "חיבור לשרת"
+
+            try {
+                String url = "jdbc:mysql://127.0.0.1:3306/triviaDB";
+                String username = "moshe";
+                String password = "Yyjmk123456@";
+
+                Connection conn = DriverManager.getConnection(url, username, password);
+                System.out.println("✅ חיבור למסד הנתונים הצליח!");
+                conn.close();
+            } catch (Exception e) {
+                System.out.println("❌ שגיאה בחיבור למסד: " + e.getMessage());
+            }
+        };
+    }
+}
+________________________________________________________________________________________
+**@SpringBootApplication
+  public class TriviaApplication {
+      public static void main(String[] args) {
+          SpringApplication.run(TriviaApplication.class, args);
+      }
+  }
+זהו הקובץ הראשי שמפעיל את האפליקציה (קובץ ה־main של Spring Boot)
+       @SpringBootApplication - קיצור נוח לשלוש אנוטציות
+           @Configuration
+             @EnableAutoConfiguration
+                @ComponentScan
+כשמריצים את האפליקציה ספרינג מבצע שלוש פעולות:
+   מגדיר קונפיגורציה
+   מחפש את כל ה־@Components בפרויקט (כולל @RestController, @Service וכו')
+   מפעיל את כל מה שצריך אוטומטית
+
+**@EntityScan("com.moka.trivia.model")
+תסרוק את כל המחלקות ב־com.moka.trivia.model ותחפש שם ישויות (@Entity)
+     החשיבות היא מאחר ואם המחלקות לא יושבות באותה חבילה של האפליקציה ספרינג לא יזהה אותם אוטומטית
+     אז אנחנו מצהירים במפורש איפה לחפש את הישויות
+
+**public interface QuestionRepository extends JpaRepository<...> {}
+     בלי זה – הוא לא היה מבין שאלה מחלקות שמנהלות חיבור למסד.
+
+
+     **לסיכום**
+TriviaApplication.java -	מפעיל את כל הפרויקט
+@EntityScan	מחפש את הישויות      - (@Entity)
+@EnableJpaRepositories - 	מחפש את ה־repositories
+@SpringBootApplication -	מפעיל את Spring באופן אוטומטי כולל סריקות ותצורה
+
+
+
+
+
+
+
+
+

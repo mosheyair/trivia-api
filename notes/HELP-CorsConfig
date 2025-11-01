@@ -1,0 +1,232 @@
+package com.moka.trivia.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class CorsConfig {
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedOrigins(
+                                "http://localhost:3000",
+                                "http://localhost:5173",
+                                "https://www.mokafullstack.com",
+                                "https://api.mokafullstack.com"
+                        )
+                        .allowedMethods("GET","POST","PUT","DELETE","OPTIONS")
+                        .allowedHeaders("*");
+            }
+        };
+    }
+****************************************************************************************
+***מחלקת קונפיגורציה***
+     זו מחלקת קונפיגורציה (הגדרות מערכת) ב־Spring Boot
+שמטרתה להגדיר כללים לתקשורת חוצה מקורות (CORS) בין השרת (Java Spring)
+    לבין לקוחות (כמו React שרץ ב־localhost או בדומיין mokafullstack.com)
+------------------------------------------------------------------------------------
+CORS = Cross-Origin Resource Sharing (שיתוף משאבים בין מקורות שונים.)
+   זו מדיניות אבטחה של הדפדפן שמטרתה להגן על המשתמש –
+   והיא חוסמת אתרים מלתקשר עם שרתים שלא אישרו במפורש את הבקשות הללו.
+
+Cross-Origin - (מקורות) מתייחס לשלושה דברים
+    Protocol (http / https)
+       Domain (www.mokafullstack.com)
+          Port (3000 / 8080 וכו')
+
+   corsמה קורה בפועל ב
+    כשאנחנו שולחים בקשת XHR/Fetch/AJAX
+מלקוח (ריאקט כדוגמא) לשרת ספרינג
+cross-origin אם יש לנו מספר דומיינים או פורטים שונים זה
+הדפדפן שולח קודם כל בקשת (OPTIONS) כדי לבדוק אם זה מותר
+לכן אנחנו מוסיפים תגובה מתאימה:
+Access-Control-Allow-Origin: http://localhost:3000
+Access-Control-Allow-Methods: GET, POST, PUT, DELETE
+Access-Control-Allow-Headers: Content-Type
+אם לא נוסיף את התגובה המתאימה - הבקשה תחסם! וזה בדיוק מה שמחלקת (CorsConfig) פותרת
+allowedOrigins - מאשרת מקורות ספציפיים
+allowedMethods - מאשרת פעולות
+allowedHeaders - Headers מאשרת
+
+CORS זה מנגנון אבטחה של הדפדפן שמונע תקשורת בין דומיינים שונים בלי אישור.
+כדי לעבוד עם Frontend ו־Backend על פורטים שונים, חייבים להגדיר CORS בשרת!
+------------------------------------------------------------------------------------------
+Headers (כותרות) - שנישלחות בין הדפדפן לשרת (Response)או התגובה  (Request)הם חלק מהבקשה(Request)
+הם משמשים להעברת מידע נוסף על הבקשה או התגובה, לא התוכן עצמו,
+אלא מידע שמסביר על התוכן, מהות הבקשה, הרשאות ועוד.
+כמו חבילה ששולחים:
+  Header - פרטים על החבילה כגון מי שולח, שפה, סוג, הרשאות
+   Body - תכולת החבילה, כמו הנתונים שיש בטבלה
+    Host - לאיזה שרת אנחנו ניגשים
+     Content-Type -(למשל JSON) איזה סוג מידע אנחנו שולחים
+       Authorization - אם יש טוקן או הרשאה מיוחדת לבקשה
+
+        ***סוגי -HEADERS- נפוצים***
+Content-Type:               	   מציין את סוג התוכן שאתה שולח או מקבל (JSON, HTML, וכו')
+Authorization:              	  מכיל טוקן או הרשאת כניסה
+Accept:                	מה הלקוח מוכן לקבל בחזרה (למשל application/json)
+Access-Control-Allow-Origin:	קשור ל־CORS – מאשר למי מותר לגשת לשרת
+User-Agent:                 	    מזהה את סוג הדפדפן/אפליקציה ששולחת את הבקשה
+Cookie:                     	מעביר עוגיות (Session למשל)
+
+יש גם Response Headers
+   כשהשרת מחזיר תשובה – גם הוא שולח headers:
+        HTTP/1.1 200 OK
+        Content-Type: application/json
+        Access-Control-Allow-Origin: http://localhost:3000
+ב־CORS חייבים להרשות Headers מסוימים (למשל Authorization)
+ב־API לרוב שולחים טוקן ב־Authorization Header
+ב־POST/PUT חייבים לציין Content-Type: application/json אם שולחים JSON
+
+HTTP הם חלק בלתי נפרד מכל בקשת Headers.
+הם אומרים לשרת:
+ איך לפרש את הבקשה, מה סוג התוכן, מי השולח, האם מותר, איזה שפה, ועוד...
+
+==========================================================================================
+
+**package com.moka.trivia.config;
+מציין את המיקום של הקובץ במבנה הפרויקט.
+הקובץ יושב תחת החבילה (package) com.moka.trivia.config,
+וזה אומר שזה חלק מה־config של המערכת
+
+**import org.springframework.context.annotation.Bean;
+  @Bean -  (רכיב שמנוהל ע"י ספרינג) Bean מסמן מתודת קונפיגורציה שמייצרת
+
+**import org.springframework.context.annotation.Configuration;
+    @Configuration - מציין שזו מחלקה של הגדרות (ולא מחלקת שירות או קונטרולר)
+
+**import org.springframework.web.servlet.config.annotation.CorsRegistry;
+   CorsRegistry - CORS מאפשר להגדיר כללי
+
+**import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+    WebMvcConfigurer - של ספרינג MVC ממשק שמאפשר להוסיף הגדרות למערכת ה
+
+**@Configuration
+  public class CorsConfig {
+     מחלקת הגדרה (@Configuration) בשם CorsConfig
+     ספרינג טוען את המחלקה הזו  אוטומטית בזמן עליית השרת
+
+      **@Bean**
+**public WebMvcConfigurer corsConfigurer() {...
+
+     WebMvcConfigurer - של ספרינג-בוט MVCממשק הגדרות למערכת ה־
+       הוא מאפשר לשנות התנהגויות כמו:
+          קונפיגורציית CORS
+          פורמט תאריכים
+          טיפול ב־JSON
+     MVC (Model – View – Controller) - (design pattern) זו תבנית עיצוב
+          שמשמשת בעיקר ל־יישומי Web ו־ממשקים גרפיים
+          כדי לארגן את הקוד לפי תפקידים ברורים
+       המטרה היא להפריד את הקוד לשלוש שכבות וכל שכבה מתעסקת בתחום אחר:
+           Model - מנהל את הנתונים, מבנה האובייקטים והחיבור למסד הנתונים
+           View - (בדרך כלל HTML / JSON / JSP וכו') אחראי להצגת המידע למשתמש
+           Controller - מקבל את הבקשה מהמשתמש ומחליט מה לעשות איתה (מעין "מנהל תנועה")
+
+     corsConfigurer() -  WebMvcConfigurer מתודה שמיצרת אובייקט שמממש את
+     @Bean -  Spring Context רושם את הקונפיגורציה הזו ב־
+                 (כל האפליקציה מכירה בזה וזה נכנס לפעולה באופן אוטומטי)
+
+**return new WebMvcConfigurer() {
+      @Override
+      public void addCorsMappings(CorsRegistry registry) {
+          מחזיר מופע אנונימי (new WebMvcConfigurer() {}) שמגדיר מחדש את המתודה addCorsMappings
+          זו המתודה שדרכה אומרים לשרת:
+             אילו דומיינים מורשים לשלוח אליו בקשות.
+               אילו פעולות מותרות (GET, POST וכו').
+                 אילו כותרים מותר לשלוח.
+
+**registry.addMapping("/**")
+    כל הנתיבים פתוחים לתקשורת חיצונית (/** = כל הנתיבים בפרויקט).
+
+**allowedOrigins(
+      "http://localhost:3000",
+      "http://localhost:5173",
+      "https://www.mokafullstack.com",
+      "https://api.mokafullstack.com"
+  )
+      הרשאת בקשות ממקורות ספציפיים:
+        שני המקומיים (React ב־localhost, גרסאות שונות)
+          שניים מהשרת שלי (האתר שלי וה־API שלי)
+
+ב־CORS, השרת חייב לאשר את הדומיינים שיכולים לגשת אליו –
+אחרת הדפדפן יחסום את הבקשה אוטומטית (לא נראה אפילו שגיאה בשרת, רק בדפדפן!).
+
+**.allowedMethods("GET","POST","PUT","DELETE","OPTIONS")
+    אילו סוגי בקשות HTTP מותרות.
+    "OPTIONS" - CORS חשוב, מאחר והדפדפן שולח אותה אוטומטית לפני קריאת
+                  כדי לבדוק שהשרת מאפשר
+
+**.allowedHeaders("*");
+     כל סוגי ה־headers (כמו Authorization, Content-Type וכו') מותרים.
+======================================================================================
+         **סיכום תמציתי**
+@Configuration - מציין שמדובר במחלקת קונפיגורציה
+@Bean - אומר לספרינג לטעון ולהפעיל את האובייקט שנחזור ממנו
+WebMvcConfigurer -(CORS כאן זה משמש ל) HTTP מאפשר להגדיר חוקים לתקשורת
+allowedOrigins(...) - API אילו אתרים יכולים לגשת ל־
+allowedMethods(...) - HTTP אלו פעילות מותרת של
+allowedHeaders("*") - headers פתוח לכל סוגי ה־
+
+========================================================================================
+
+
+המחלקה הזו אחראית להגדיר תצורות (הגדרות מערכת) של האפליקציה
+היא אינה מייצגת אוביקט (קטגוריה או שאלות), המחלקה הזו אומרת לספרינג:
+    כשאתה עולה (boot), תיצור לי אובייקטים ותנהל אותם לפי הכללים שאני כותב כאן.
+
+@Bean -כדי שאוכל להשתמש בו בכל מקום בפרוייקט Spring Container תיצור את האובייקט הזה ותכניס אותו ל
+    כמו לשים אובייקט בתוך קופסא ואז אפשר להוציא בכל מקום בפרוייקט
+זה חלק ממנגנון שנקרא Dependency Injection — Spring מזריק לך את הרכיבים שאתה צריך (כמו שירותים, קונפיגורציות, ריפוזיטוריז וכו') במקום ליצור אותם עם new
+
+WebMvcConfigurer - CORS הגדרת אוביקט חדש שמכיל הגדרות
+  Beanרושמים את האובייקט הזה כ
+  כדי שספרינג יוכל להשתמש בו ולדעת איך לטפל בבקשות מהדפדפן שמגיעות ממקורות שונים
+
+@Configuration - זו מחלקה שמכילה הגדרות לתפעול של ספרינג
+@Bean - תיצור את האובייקט הזה ותנהל אותו בשבילי
+
+
+**תרשים זרימה**
+
+[Spring Boot עולה ומפעיל את האפליקציה]
+        |
+        | סורק את המחלקות המסומנות ב-@Configuration
+        ▼
+[Spring מוצא את המחלקה CorsConfig]
+        |
+        | מזהה שיש בה מתודה עם @Bean:
+        | public WebMvcConfigurer corsConfigurer()
+        ▼
+[Spring מריץ את המתודה ויוצר מופע אנונימי]
+        |
+        | המופע מממש את הממשק WebMvcConfigurer
+        | ומגדיר את המתודה: addCorsMappings()
+        ▼
+[Spring קורא ל-addCorsMappings עם CorsRegistry]
+        |
+        | מוגדרת שם ההרשאה הבאה:
+        | - addMapping("/**") ← כל הנתיבים
+        | - allowedOrigins(...mokafullstack, localhost...)
+        | - allowedMethods(GET, POST, PUT, DELETE, OPTIONS)
+        | - allowedHeaders("*")
+        ▼
+[Spring רושם את חוקי ה-CORS במערכת]
+        |
+        | כאשר הדפדפן שולח בקשה מ-Frontend לדומיין אחר
+        ▼
+[Spring מחזיר תגובת CORS תקינה]
+        |
+        | Access-Control-Allow-Origin: ...
+        ▼
+[הדפדפן מרשה את הבקשה וממשיך כרגיל]
+
+
+
+
+
