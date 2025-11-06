@@ -4,14 +4,14 @@
 
 # הגדרות
 
-$server  = root@69.62.109.118 # המשתמש + כתובת ה־IP של השרת
+$server  = "root@69.62.109.118" # המשתמש + כתובת ה־IP של השרת
 $remote  = "/home/moka/api" # הנתיב בשרת שבו יושב הקובץ JAR וקובץ ההגדרות
 $profile = "prod" # פרופיל Spring Boot שנטען (כאן "prod" – הפקה).
 
 #  בניה של JAR
 
 Write-Host ">> Building JAR (skip tests)..." -ForegroundColor Cyan # מדפיס הודעה צבעונית לטרמינל
-mvn -DskipTests package #  בונה את הפרויקט ע"י Maven (מדלג על טסטים), ויוצר JAR בתיקיית target.
+.\mvnw.cmd -DskipTests package #  בונה את הפרויקט ע"י Maven (מדלג על טסטים), ויוצר JAR בתיקיית target.
 if ($LASTEXITCODE -ne 0) { throw "Maven build failed" } #  אם Maven נכשל → זורק שגיאה ומפסיק את הסקריפט.
 
 #  חיפוש הקובץ JAR האחרון שנוצר
